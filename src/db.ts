@@ -1,5 +1,5 @@
 import mongoose  from "mongoose";
-import { Schema } from "mongoose";
+import { Schema , Model } from "mongoose";
 import {ObjectId} from "mongoose";
 
 const user = new Schema({
@@ -7,8 +7,13 @@ const user = new Schema({
     password : {type: String , require: true}
 });
 
-const usermodel = mongoose.model("users" , user);
+export const usermodel = mongoose.model("users" , user);
 
-module.exports = {
-    usermodel : usermodel,
-};
+const content = new Schema({
+    type : String,
+    title : String,
+    link : String,
+    tag : [{type:mongoose.Types.ObjectId , ref: 'tag'}],
+    userId : {type: mongoose.Types.ObjectId , ref: 'users' , require: true}
+});
+export const contentmodel = mongoose.model("contents" , content);
