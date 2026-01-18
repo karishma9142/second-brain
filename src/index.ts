@@ -1,12 +1,13 @@
-import express, { json } from "express";
+import express, { json, Request, Response } from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { genSaltSync, hashSync, compareSync } from "bcrypt-ts";
 import * as z from "zod";
 import { ZodError } from "zod";
-import { usermodel , contentmodel} from "./db";
+import { usermodel , contentmodel ,linkModel} from "./db";
 import {UserMiddlware} from './middleware'
-import e from "express";
+import {randomUUID} from "crypto";
+import { link } from "fs";
 mongoose.connect("mongodb+srv://admin:ieiDNs5hmV2mhVFL@cluster0.tp8kfsa.mongodb.net/second-brain");
 const salt = genSaltSync(10);
 const JWT_SECRETE = "karishmacnieucuhf938723";
@@ -120,11 +121,13 @@ app.post("/api/v1/content", UserMiddlware , async (req, res) => {
     const type = req.body.type;
     const link = req.body.link;
     const title = req.body.title;
+    const share = req.body.share;
     try {
         await contentmodel.create({
             type:type,
             link:link,
             title : title,
+            share : share,
             // @ts-ignore
             userId:req.userId,
             tag:[]
@@ -188,15 +191,132 @@ app.delete("/api/v1/content", UserMiddlware, async (req, res) => {
         msg: "Internal server error",
       });
     }
-  });
-  
+}); 
 
 app.post("/api/v1/brain/share", UserMiddlware , async (req, res) => {
+    // @ts-ignore
+    const userId = req.userId;
 
-})
+    try {
+        const share = await linkModel.findOne({
+            userId : userId
+        })
 
-app.get("/api/v1/brain/:shareLink", UserMiddlware , async (req, res) => {
+        if(!share){
+            const  shareLink = crypto.randomUUID();
+            await linkModel.create({
+                shareLink : shareLink ,
+                share : true ,
+                userId : userId
+            })
+            return res.status(200).json({
+                msg  : "link created succesfully",
+                link : shareLink
+            })
+        }else{
+            res.status(200).json({
+                msg : 'link already created'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            msg : "internal server error"
+        })
+    }
+});
 
+app.patch("/api/v1/brain/share/dec" ,UserMiddlware, async(req : Request , res:Response) => {
+    try {
+        // @ts-ignore
+        const userId = req.userId;
+        const link = await linkModel.findOne({
+            userId : userId
+        })
+        if(!link){
+            return res.json({
+                msg  : "link does not exit"
+            })
+        }
+        link.share = false;
+        await link.save();
+        res.status(200).json({
+            mg  : "link deactivated"
+        })
+    } catch (error) {
+        res.status(500).json({
+            msg : "internal server error"
+        })
+    }
+});
+
+app.patch("/api/v1/brain/share/active" ,UserMiddlware, async(req : Request , res:Response) => {
+    try {
+        // @ts-ignore
+        const userId = req.userId;
+        const link = await linkModel.findOne({
+            userId : userId
+        })
+        if(!link){
+            return res.json({
+                msg  : "link does not exit"
+            })
+        }
+        link.share = true;
+        await link.save();
+        res.status(200).json({
+            mg  : "link deactivated"
+        })
+    } catch (error) {
+        res.status(500).json({
+            msg : "internal server error"
+        })
+    }
+});
+
+
+app.get("/api/v1/brain/:shareLink", async (req, res) => {
+    try {
+        const {shareLink} = req.params;
+        const findLink = await linkModel.findOne({
+            shareLink : shareLink ,
+            share : true
+        })
+        if(!findLink){
+            return res.status(403).json({
+                msg : "invalid link"
+            })
+        }
+        if(!findLink.userId){
+            return res.status(403).json({
+                msg : "user does not exit"
+            })
+        }
+        const userId = findLink.userId;
+        const user = await usermodel.findById(userId);
+        if(!user){
+            return res.status(404).json({
+                msg : "user does not exit"
+            })
+        }
+        const username = user.username;
+        const content = await contentmodel.find({
+            userId : userId ,
+            share : true
+        })
+        if(content.length==0){
+            return res.status(200).json({
+                msg : "no public content exit"
+            })
+        }
+        res.status(200).json({
+            username : username,
+            content : content
+        })
+    } catch (error) {
+        res.status(500).json({
+            msg : "internal server error"
+        })
+    }
 });
 
 app.listen(3000);
