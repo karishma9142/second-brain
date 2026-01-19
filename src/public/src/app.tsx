@@ -1,11 +1,14 @@
 import { Button } from "./components/buttom";
+import { PlusIcon } from "./icons/plusIcon";
 
 export function App() {
 
   return (
     <>
-      <Button varient="primary" size="lg" text="hello" onclick={()=>{}}></Button>
-      <Button varient="secondary" size="lg" text="hello" onclick={()=>{}}></Button>
+    <br />
+      <Button  startIcon={<PlusIcon size="md"/>} varient="primary" size="md" text="Share Brain" onclick={()=>{}}></Button>
+      <br />
+      <Button varient="secondary" size="md" text="Add Content" onclick={()=>{}}></Button>
     </>
   )
 }

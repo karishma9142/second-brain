@@ -1,3 +1,11 @@
+declare global {
+    namespace interface{
+        export interface Request{
+            userId?: string;
+        }
+    }
+}
+
 import express, { json, Request, Response } from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -144,7 +152,7 @@ app.post("/api/v1/content", UserMiddlware , async (req, res) => {
 
 app.get("/api/v1/content", UserMiddlware , async (req, res) => {
     try {
-            // @ts-ignore
+          //@ts-ignore
         const useId = req.userId;
         const content = await contentmodel.find({
             userId : useId

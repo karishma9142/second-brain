@@ -9,16 +9,17 @@ interface buttonProps {
 
 const varientStyle = {
     "primary" : "bg-pu600 text-white",
-    "secondary" : "bg-pu400 text-pu600"
+    "secondary" : "bg-pu300 text-pu600"
 }
 
-const defaultStyle = "rounded-md p-4";
+const defaultStyle = "rounded-md p-2";
 
 const sizeStyle = {
-    "sm" : "p-2" ,
-    "md" : "p-4" ,
-    "lg" : "p-6"
+    "sm" : "px-2 py-1 text-sm" ,
+    "md" : "pl-4 pr-6 py-2 text-sm" ,
+    "lg" : "px-6 py-3 text-sm"
 }
 export const Button =(prpos : buttonProps) => {
-    return <button className={ `${defaultStyle} ${sizeStyle[prpos.size]} ${varientStyle[prpos.varient]}`}>{prpos.text}</button>
+    return <button className={ `${defaultStyle} ${sizeStyle[prpos.size]} ${varientStyle[prpos.varient]}`}>
+        <div className="flex gap-1.5 items-center">{prpos.startIcon} {prpos.text} {prpos.endIcon}</div></button>
 }   

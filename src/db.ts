@@ -9,9 +9,15 @@ const user = new Schema({
 });
 
 export const usermodel = mongoose.model("users" , user);
-
+export enum ContentType {
+    DOCUMENT = "document",
+    LINK = "link",
+    IMAGE = "image",
+    AUDIO = "audio",
+  }
+  
 const content = new Schema({
-    type : String,
+    type : {type: String , enum: Object.values(ContentType) , required: true},
     title : String,
     link : String,
     share : boolean,
