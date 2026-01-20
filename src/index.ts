@@ -135,7 +135,6 @@ app.post("/api/v1/content", UserMiddlware , async (req, res) => {
             type:type,
             link:link,
             title : title,
-            share : share,
             // @ts-ignore
             userId:req.userId,
             tag:[]
@@ -308,8 +307,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
         }
         const username = user.username;
         const content = await contentmodel.find({
-            userId : userId ,
-            share : true
+            userId : userId 
         })
         if(content.length==0){
             return res.status(200).json({

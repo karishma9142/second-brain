@@ -20,7 +20,6 @@ const content = new Schema({
     type : {type: String , enum: Object.values(ContentType) , required: true},
     title : String,
     link : String,
-    share : boolean,
     tag : [{type:mongoose.Types.ObjectId , ref: 'tag'}],
     userId : {type: mongoose.Types.ObjectId , ref: 'users' , require: true}
 });
