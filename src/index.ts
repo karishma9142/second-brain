@@ -15,13 +15,17 @@ import { ZodError } from "zod";
 import { usermodel , contentmodel ,linkModel} from "./db";
 import {UserMiddlware} from './middleware'
 import {randomUUID} from "crypto";
+import cors from "cors"
 import { link } from "fs";
 mongoose.connect("mongodb+srv://admin:ieiDNs5hmV2mhVFL@cluster0.tp8kfsa.mongodb.net/second-brain");
 const salt = genSaltSync(10);
 const JWT_SECRETE = "karishmacnieucuhf938723";
 
 const app = express();
-app.use(express.json());
+
+app.use(cors());
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
 
 const user = z.object({
@@ -50,39 +54,43 @@ app.post("/api/v1/signup", async (req, res) => {
             const cheakvalideation = user.parse({
                 username: username,
                 password: password
-            })
+            });
         } catch (error: unknown) {
             if (error instanceof ZodError) {
-                res.status(411).json({
+                return res.status(411).json({
                     errors: error.message
                 });
             }
         }
-        const hasspassword = hashSync(password, salt)
+
+        const hasspassword = hashSync(password, salt);
+
         try {
             await usermodel.create({
                 username: username,
                 password: hasspassword
-            })
-            res.status(200).json({
+            });
+
+            return res.status(200).json({
                 msg: "you are signed up"
-            })
+            });
+
         } catch (error) {
-            res.status(403).json({
-                msg: "user already exist"
-            })
             console.log(error);
+            return res.status(403).json({
+                msg: "user already exist"
+            });
         }
 
     } catch (error) {
-        res.status(500).json({
+        console.log(error);
+        return res.status(500).json({
             msg: "faild sign up",
             error: error
-        })
-        console.log(error);
+        });
     }
-
 });
+
 
 app.post("/api/v1/signin", async (req, res) => {
     try {

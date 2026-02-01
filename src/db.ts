@@ -11,9 +11,8 @@ const user = new Schema({
 export const usermodel = mongoose.model("users" , user);
 export enum ContentType {
     DOCUMENT = "document",
-    LINK = "link",
-    IMAGE = "image",
-    AUDIO = "audio",
+    YOUTUBE = "youtube",
+    TWITTER = "twitter" 
   }
   
 const content = new Schema({
