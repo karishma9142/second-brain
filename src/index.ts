@@ -139,7 +139,7 @@ app.post("/api/v1/content", UserMiddlware , async (req, res) => {
     const title = req.body.title;
     const share = req.body.share;
     try {
-        await contentmodel.create({
+        const response = await contentmodel.create({
             type:type,
             link:link,
             title : title,
@@ -148,7 +148,8 @@ app.post("/api/v1/content", UserMiddlware , async (req, res) => {
             tag:[]
         })
         return res.status(200).json({
-            msg : "content is addded"
+            msg : "content is addded",
+            response : response
         })
     } catch (error) {
         return res.status(403).json({
